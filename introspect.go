@@ -97,7 +97,6 @@ func queryPath(path []string, data any) (any, error) {
 	return nil, errors.New("Not found.")
 }
 
-// TODO, this does not work
 // insert value at path
 func insertPath(path []string, data any, newValue any) (any, error) {
 	
@@ -141,11 +140,11 @@ func insertPath(path []string, data any, newValue any) (any, error) {
 	case reflect.Struct:
 		for i := 0; i < val.NumField(); i++ {
 			if val.Type().Field(i).Name == path[0] {
-				next := val.Field(i).Addr().Interface()
+				next := val.Field(i).Interface()
 				if r, err := insertPath(path[1:], &next, newValue); err != nil {
 					return val.Interface(), err
 				} else {
-					val.Set(reflect.ValueOf(r))
+					val.Field(i).Set(reflect.ValueOf(r))
 					return val.Interface(), nil
 				}
 			}
