@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-// <--------------------------------------- Convert ------------------------------------------->
+// <----- Convert ----------------------------------------------------------------------------->
 // <------------------------------------------------------------------------------------------->
 
 // toMapAny converts any data into map[string]any.
@@ -42,7 +42,7 @@ func toSliceAny(data any) []any {
 	return newSlice
 }
 
-// <----------------------------------------- Query Value ------------------------------------->
+// <----- Query Value ------------------------------------------------------------------------->
 // <------------------------------------------------------------------------------------------->
 
 // getValueMapPaths finds paths in nested data that end with a target value.
@@ -92,7 +92,7 @@ func getValueSlicePaths(data []any, pathSeen []string, target any, results *[][]
 // TODO traverse and record paths that end with the target value.
 func getValueStructPaths(data any, pathSeen []string, target any, results *[][]string) {}
 
-// <----------------------------------------- Query Path -------------------------------------->
+// <----- Query Path -------------------------------------------------------------------------->
 // <------------------------------------------------------------------------------------------->
 
 // TODO traverse data by path and return end value or an error if the path is invalid.
@@ -154,7 +154,7 @@ func getStructPathValue(data any, path []string) (any, error) {
 	return nil, nil
 }
 
-// <-------------------------------------------- Insert --------------------------------------->
+// <----- Insert ------------------------------------------------------------------------------>
 // <------------------------------------------------------------------------------------------->
 
 // replaceMapValues traverses a deep map and replaces the end value with a new value.
