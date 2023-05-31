@@ -132,7 +132,7 @@ func insertPath(path []string, data any, newValue any) (any, error) {
 				if r, err := insertPath(path[1:], next, newValue); err != nil {
 					return val.Interface(), err
 				} else {
-					val.Set(reflect.ValueOf(r))
+					val.Index(i).Set(reflect.ValueOf(r))
 					return val.Interface(), nil
 				}
 			}

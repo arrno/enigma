@@ -16,10 +16,10 @@ func test3(){
 	// 	},
 	// }
 	paths := [][]string{
-		// {"hi", "1"},
+		{"hi", "1"},
 		{"foo"},
-		// {"bar","buz","4"},
-		// {"biz", "box", "fux", "1"},
+		{"bar","buz","4"},
+		{"biz", "box", "fux", "1"},
 		{"biz", "box", "mix"},
 		{"not","found"},
 	}
