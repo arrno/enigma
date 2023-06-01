@@ -5,11 +5,14 @@ import (
 	"fmt"
 )
 
+// all seems to be working other than
 func main() {
-	test4()
+	// 1, 4, 2, 3
+	test3()
 }
 
-func test4(){
+// query key
+func test4() {
 	paths := []string{}
 	queryKey([]string{}, data, "double", &paths)
 	for _, p := range paths {
@@ -28,14 +31,19 @@ func test4(){
 }
 
 // insert by path
-func test3(){
+func test3() {
 	paths := [][]string{
 		{"hi", "1"},
 		{"foo"},
-		{"bar","buz","4"},
+		{"bar", "buz", "4"},
 		{"biz", "box", "fix", "1"},
 		{"biz", "box", "mix"},
-		{"not","found"},
+		{"not", "found"},                // should not work
+		{"fac", "slic", "0", "private"}, // should not work
+		{"fac", "slic", "0", "WidgetColor"},
+		{"fac", "slic", "0", "Gadgets", "0", "Name"},
+		{"fac", "nop", "WidgetColor"}, // should not work
+		{"ptr", "0", "0", "0"},
 	}
 	// paths := [][]string{{"foo","bar"}}
 	for _, p := range paths {
@@ -49,7 +57,7 @@ func test3(){
 }
 
 // query by val
-func test1(){
+func test1() {
 	paths := []string{}
 	queryValue([]string{}, data, nil, &paths)
 	for _, p := range paths {
@@ -57,6 +65,21 @@ func test1(){
 	}
 	paths = []string{}
 	queryValue([]string{}, data, true, &paths)
+	for _, p := range paths {
+		fmt.Println(p)
+	}
+	paths = []string{}
+	queryValue([]string{}, data, "shhh", &paths)
+	for _, p := range paths {
+		fmt.Println(p)
+	}
+	paths = []string{}
+	queryValue([]string{}, data, "blue", &paths)
+	for _, p := range paths {
+		fmt.Println(p)
+	}
+	paths = []string{}
+	queryValue([]string{}, data, "p", &paths)
 	for _, p := range paths {
 		fmt.Println(p)
 	}
@@ -68,10 +91,14 @@ func test2() {
 		{"hi"},
 		{"hi", "1"},
 		{"foo"},
-		{"bar","buz","4"},
+		{"bar", "buz", "4"},
 		{"biz", "box", "fix", "1"},
 		{"biz", "box", "mix"},
-		{"not","found"},
+		{"not", "found"},
+		{"fac", "slic", "0", "private"},
+		{"fac", "slic", "0", "WidgetColor"},
+		{"fac", "slic", "0", "Gadgets", "0", "Name"},
+		{"ptr", "0", "0", "0"},
 	}
 	for _, p := range paths {
 		val, err := queryPath(p, data)
@@ -83,20 +110,20 @@ func test2() {
 	}
 }
 
-type Widget struct{
+type Widget struct {
 	WidgetColor string
-	WidgetSize int
-	Gadgets []any
-	private string
+	WidgetSize  int
+	Gadgets     []any
+	private     string
 }
-type Fidget struct{
+type Fidget struct {
 	Fidgety bool
-	Name string
+	Name    string
 }
 
 var data = map[string]any{
 	// generic
-	"hi": map[int]any{ 1: "hello"},
+	"hi":  map[int]any{1: "hello"},
 	"foo": nil,
 	"bar": map[string]any{
 		"buz": []any{0, "1", 2, nil, 7, nil},
@@ -107,8 +134,8 @@ var data = map[string]any{
 			"mix": "pop",
 			"fox": nil,
 			"fix": []any{7, "fun", 9, nil, 10, map[string]any{
-					"fiz":nil,
-				},
+				"fiz": nil,
+			},
 			},
 			"double": false,
 		},
@@ -119,23 +146,29 @@ var data = map[string]any{
 			},
 		},
 	},
+	"ptr": &[]any{&[]any{&[]any{"p"}}},
 	// with structs
 	"fac": map[string]any{
-		"wid": Widget{
-			private: "shhh",
+		"wid": &Widget{
+			private:     "shhh",
 			WidgetColor: "red",
-			WidgetSize: 10,
-			Gadgets: []any{"a", "b", "c"},
+			WidgetSize:  10,
+			Gadgets:     []any{"a", "b", "c"},
+		},
+		"nop": Widget{
+			private:     "no",
+			WidgetColor: "yellow",
+			WidgetSize:  12,
 		},
 		"slic": []any{
-			Widget{
-				private: "quiet",
+			&Widget{
+				private:     "quiet",
 				WidgetColor: "blue",
-				WidgetSize: 20,
+				WidgetSize:  20,
 				Gadgets: []any{
-					Fidget{
+					&Fidget{
 						Fidgety: true,
-						Name: "doop",
+						Name:    "doop",
 					},
 				},
 			},
