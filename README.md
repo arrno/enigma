@@ -18,7 +18,7 @@ enigma, err := NewEnigma(data)
 ```
 
 ## Paths and nodes
-Paths are strings that represent a sequence of nodes to a target. Each node in the path is separated by a dot. A node can be a map key, a slice index, or a struct field. **At this time, only slices and maps with string keys are supported node types.**
+Paths are strings that represent a sequence of nodes to a target. Each node in the path is separated by a dot. A node can be a map key, a slice index, or a struct field.
 ```Go
 path := "foo.bar.5.buz"
 ```
@@ -29,6 +29,11 @@ Query for all paths to some target value of any type.
 paths, err := enigma.QueryValue("biz")
 ```
 
+## Query by key
+Query for all paths containing some key.
+```Go
+```
+
 ## Query by path
 Query for the value located at a target path.
 ```Go
@@ -36,7 +41,7 @@ val, err := enigma.QueryPath("foo.3.bar")
 ```
 
 ## Insert by path
-Insert a value of any type at the target path.
+Insert a value of any type at the target path. **To insert properly, ensure you are respecting types and for structs, target exported fields of struct pointers.**
 ```Go
 err := enigma.InsertByPath("fiz.buzz", 7)
 ```
