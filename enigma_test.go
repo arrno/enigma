@@ -8,7 +8,15 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestInsertPath(t *testing.T) {
+func TestRun(t *testing.T) {
+	// run in order
+	QueryValue(t)
+	QueryKey(t)
+	QueryPath(t)
+	InsertPath(t)
+}
+
+func InsertPath(t *testing.T) {
 	type testCase struct {
 		set  any
 		path []string
@@ -21,6 +29,10 @@ func TestInsertPath(t *testing.T) {
 		},
 		{
 			set:  "REPLACE",
+			path: []string{"foo"},
+		},
+		{
+			set:  "REDO",
 			path: []string{"foo"},
 		},
 		{
@@ -60,6 +72,10 @@ func TestInsertPath(t *testing.T) {
 			path: []string{"fac", "slic", "0", "Gadgets", "0", "Name"},
 		},
 		{
+			set:  "REDO",
+			path: []string{"fac", "slic", "0", "Gadgets", "0", "Name"},
+		},
+		{
 			set:  "REPLACE",
 			path: []string{"fac", "slic", "0", "WidgetName"},
 			fail: true,
@@ -73,11 +89,14 @@ func TestInsertPath(t *testing.T) {
 			set:  "REPLACE",
 			path: []string{"ptr", "0", "0", "0"},
 		},
+		{
+			set:  "REDO",
+			path: []string{"ptr", "0", "0", "0"},
+		},
 	}
 	// todo...
 	// insert into slice/map with explicit types
 	// insert value of map, slice, and struct
-	// verify preservation of pointers
 	for _, tst := range tests {
 		_, err := insertPath(tst.path, &data, tst.set)
 		if !tst.fail {
@@ -90,7 +109,7 @@ func TestInsertPath(t *testing.T) {
 	}
 }
 
-func TestQueryValue(t *testing.T) {
+func QueryValue(t *testing.T) {
 	actual := []string{}
 	paths := []string{}
 	queryValue([]string{}, data, nil, &paths)
@@ -119,14 +138,15 @@ func TestQueryValue(t *testing.T) {
 		"fac.slic.0.WidgetColor",
 		"ptr.0.0.0",
 	}
-	// Sort?
+	sort.Strings(expected)
+	sort.Strings(actual)
 	assert.Equal(t, len(expected), len(actual))
 	for i := 0; i < len(expected); i++ {
 		assert.Equal(t, expected[i], actual[i])
 	}
 }
 
-func TestQueryKey(t *testing.T) {
+func QueryKey(t *testing.T) {
 	actual := []string{}
 	paths := []string{}
 	queryKey([]string{}, data, "double", &paths)
@@ -161,7 +181,7 @@ func TestQueryKey(t *testing.T) {
 	}
 }
 
-func TestQueryPath(t *testing.T) {
+func QueryPath(t *testing.T) {
 	paths := [][]string{
 		{"hi"},
 		{"hi", "1"},

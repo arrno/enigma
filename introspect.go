@@ -209,18 +209,9 @@ func insertPath(path []string, data any, newValue any) (any, error) {
 		return data, errors.New("Invalid path.")
 	}
 
-	var wasPointer bool
 	val := reflect.ValueOf(data)
 	if val.Kind() == reflect.Pointer {
 		val = val.Elem()
-		wasPointer = true
-	}
-
-	handlePtr := func(val any) any {
-		if wasPointer {
-			return &val
-		}
-		return val
 	}
 
 	switch t := val.Type().Kind(); t {
@@ -233,7 +224,7 @@ func insertPath(path []string, data any, newValue any) (any, error) {
 					return val.Interface(), err
 				} else if val.Type().Elem() == reflect.TypeOf(r) || val.Type().Elem().Kind() == reflect.Interface {
 					val.SetMapIndex(k, reflect.ValueOf(r))
-					return handlePtr(val.Interface()), nil
+					return val.Interface(), nil
 				} else {
 					return val.Interface(), errors.New("Mismatched type.")
 				}
@@ -248,7 +239,7 @@ func insertPath(path []string, data any, newValue any) (any, error) {
 					return val.Interface(), err
 				} else if val.Type().Elem() == reflect.TypeOf(r) || val.Type().Elem().Kind() == reflect.Interface {
 					val.Index(i).Set(reflect.ValueOf(r))
-					return handlePtr(val.Interface()), nil
+					return val.Interface(), nil
 				} else {
 					return val.Interface(), errors.New("Mismatched type.")
 				}
@@ -267,7 +258,7 @@ func insertPath(path []string, data any, newValue any) (any, error) {
 				} else if val.Field(i).CanSet() &&
 					val.Field(i).Type() == reflect.TypeOf(r) || val.Field(i).Type().Kind() == reflect.Interface {
 					val.Field(i).Set(reflect.ValueOf(r))
-					return handlePtr(val.Interface()), nil
+					return val.Addr().Interface(), nil
 				} else {
 					return val.Interface(), errors.New("Mismatched type.")
 				}
