@@ -15,9 +15,9 @@ func TestInsertPath(t *testing.T) {
 		{"bar", "buz", "4"},
 		{"biz", "box", "fix", "1"},
 		{"biz", "box", "mix"},
-		{"not", "found"},                // should not work
-		{"fac", "slic", "0", "private"}, // should not work
-		{"strict","0"}, // wrong type
+		{"not", "found"},                   // should not work
+		{"fac", "slic", "0", "private"},    // should not work
+		{"strict", "0"},                    // wrong type
 		{"fac", "slic", "0", "WidgetSize"}, // wrong type
 		{"fac", "slic", "0", "Gadgets", "0", "Name"},
 		{"fac", "slic", "0", "WidgetName"}, // should not work
@@ -30,7 +30,7 @@ func TestInsertPath(t *testing.T) {
 	result, _ := json.MarshalIndent(data, "", "    ")
 	assert.Equal(t, replaced, result)
 
-	// todo... 
+	// todo...
 	// insert into slice/map with explicit types
 	// insert value of map, slice, and struct
 }
