@@ -9,7 +9,6 @@ import (
 )
 
 func TestInsertPath(t *testing.T) {
-	// TODO handle panic on set type mismatch
 	paths := [][]string{
 		{"hi", "1"},
 		{"foo"},
@@ -18,9 +17,8 @@ func TestInsertPath(t *testing.T) {
 		{"biz", "box", "mix"},
 		{"not", "found"},                // should not work
 		{"fac", "slic", "0", "private"}, // should not work
-		// wrong types TODO
-		// {"strict","0"},
-		// {"fac", "slic", "0", "WidgetSize"},
+		{"strict","0"}, // wrong type
+		{"fac", "slic", "0", "WidgetSize"}, // wrong type
 		{"fac", "slic", "0", "Gadgets", "0", "Name"},
 		{"fac", "slic", "0", "WidgetName"}, // should not work
 		{"fac", "nop", "WidgetColor"},      // should not work
@@ -32,7 +30,11 @@ func TestInsertPath(t *testing.T) {
 	result, _ := json.MarshalIndent(data, "", "    ")
 	assert.Equal(t, replaced, result)
 
+	// todo... 
+	// insert into slice/map with explicit types
+	// insert value of map, slice, and struct
 }
+
 func TestQueryValue(t *testing.T) {
 	actual := []string{}
 	paths := []string{}
@@ -101,6 +103,7 @@ func TestQueryKey(t *testing.T) {
 		assert.Equal(t, expected[i], actual[i])
 	}
 }
+
 func TestQueryPath(t *testing.T) {
 	paths := [][]string{
 		{"hi"},
