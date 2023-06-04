@@ -40,6 +40,7 @@ func walk(data any, depth uint) {
 	}
 }
 
+// display will pretty print the data.
 func display(data any) {
 	r, _ := json.MarshalIndent(data, "", "    ")
 	fmt.Println(string(r))
