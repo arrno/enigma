@@ -52,7 +52,7 @@ fmt.Println(val)
 ```
 
 ## Insert by path
-Insert a value into a target path. **Insertions on struct fields will only work if the target is a public field on a struct pointer. The inserted value must also match the type deffinition of the parent node per usual.**
+Insert a value into a target path. **Insertions on struct fields will only work if the target is a public field on a struct pointer. The inserted value must also match the type definition of the parent node per usual.**
 ```Go
 err := enigma.InsertByPath("fiz.buzz", 7)
 ```
