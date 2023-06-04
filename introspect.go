@@ -209,9 +209,19 @@ func insertPath(path []string, data any, newValue any) (any, error) {
 		return data, errors.New("Invalid path.")
 	}
 
+	wasPointer := false
 	val := reflect.ValueOf(data)
+
 	if val.Kind() == reflect.Pointer {
+		wasPointer = true
 		val = val.Elem()
+	}
+
+	handlePtr := func() any {
+		if wasPointer {
+			return val.Addr().Interface()
+		}
+		return val.Interface()
 	}
 
 	switch t := val.Type().Kind(); t {
@@ -221,12 +231,12 @@ func insertPath(path []string, data any, newValue any) (any, error) {
 			if (ok && s == path[0]) || (fmt.Sprintf("%d", k.Interface()) == path[0]) {
 				next := val.MapIndex(k).Interface()
 				if r, err := insertPath(path[1:], next, newValue); err != nil {
-					return val.Interface(), err
+					return handlePtr(), err
 				} else if val.Type().Elem() == reflect.TypeOf(r) || val.Type().Elem().Kind() == reflect.Interface {
 					val.SetMapIndex(k, reflect.ValueOf(r))
-					return val.Interface(), nil
+					return handlePtr(), nil
 				} else {
-					return val.Interface(), errors.New("Mismatched type.")
+					return handlePtr(), errors.New("Mismatched type.")
 				}
 			}
 		}
@@ -236,12 +246,12 @@ func insertPath(path []string, data any, newValue any) (any, error) {
 			if fmt.Sprintf("%d", i) == path[0] {
 				next := val.Index(i).Interface()
 				if r, err := insertPath(path[1:], next, newValue); err != nil {
-					return val.Interface(), err
+					return handlePtr(), err
 				} else if val.Type().Elem() == reflect.TypeOf(r) || val.Type().Elem().Kind() == reflect.Interface {
 					val.Index(i).Set(reflect.ValueOf(r))
-					return val.Interface(), nil
+					return handlePtr(), nil
 				} else {
-					return val.Interface(), errors.New("Mismatched type.")
+					return handlePtr(), errors.New("Mismatched type.")
 				}
 			}
 		}
@@ -254,13 +264,13 @@ func insertPath(path []string, data any, newValue any) (any, error) {
 			if val.Type().Field(i).Name == path[0] {
 				next := val.Field(i).Interface()
 				if r, err := insertPath(path[1:], next, newValue); err != nil {
-					return val.Interface(), err
+					return handlePtr(), err
 				} else if val.Field(i).CanSet() &&
 					val.Field(i).Type() == reflect.TypeOf(r) || val.Field(i).Type().Kind() == reflect.Interface {
 					val.Field(i).Set(reflect.ValueOf(r))
-					return val.Addr().Interface(), nil
+					return handlePtr(), nil
 				} else {
-					return val.Interface(), errors.New("Mismatched type.")
+					return handlePtr(), errors.New("Mismatched type.")
 				}
 			}
 		}

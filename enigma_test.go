@@ -107,26 +107,45 @@ func InsertPath(t *testing.T) {
 }
 
 func TestInsert(t *testing.T) {
-	// insert into slice/map with explicit types
-	// insert value of map, slice, and struct
+	// insert typed map into typed slice
 	d := []map[string]int{{}}
 	insertPath([]string{"0"}, d, map[string]int{"foo": 7})
 	actual, _ := queryPath([]string{"0", "foo"}, d)
 	assert.Equal(t, 7, actual)
 
+	// insert into typed map
 	insertPath([]string{"0", "foo"}, d, 9)
 	actual, _ = queryPath([]string{"0", "foo"}, d)
 	assert.Equal(t, 9, actual)
 
+	// insert a struct into a typed map
 	sd := map[string]Fidget{"one": {}}
 	insertPath([]string{"one"}, sd, Fidget{Name: "Sassy"})
 	actual, _ = queryPath([]string{"one", "Name"}, sd)
 	assert.Equal(t, "Sassy", actual)
 
+	// insert a slice into a typed map
 	sld := map[string][]int{"one": {}}
 	insertPath([]string{"one"}, sld, []int{0, 1, 2})
 	actual, _ = queryPath([]string{"one", "2"}, sld)
-	assert.Equal(t, 2, 2)
+	assert.Equal(t, 2, actual)
+
+	// write to something beyond a non pointer struct
+	sw := map[string]Widget{"one": {Gadgets: []any{"foo"}}}
+	insertPath([]string{"one", "Gadgets", "0"}, sw, "bar")
+	actual, _ = queryPath([]string{"one", "Gadgets", "0"}, sw)
+	assert.Equal(t, "bar", actual)
+
+	// should fail because writing to non ptr struct
+	sw = map[string]Widget{"one": {Gadgets: []any{"foo"}}}
+	insertPath([]string{"one", "Gadgets"}, sw, []any{"bar"})
+	actual, _ = queryPath([]string{"one", "Gadgets", "0"}, sw)
+	assert.Equal(t, "foo", actual)
+
+	swp := map[string]*Widget{"one": {Gadgets: []any{"foo"}}}
+	insertPath([]string{"one", "Gadgets", "0"}, swp, "bar")
+	actual, _ = queryPath([]string{"one", "Gadgets", "0"}, swp)
+	assert.Equal(t, "bar", actual)
 
 }
 
