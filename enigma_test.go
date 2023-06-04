@@ -94,9 +94,6 @@ func InsertPath(t *testing.T) {
 			path: []string{"ptr", "0", "0", "0"},
 		},
 	}
-	// todo...
-	// insert into slice/map with explicit types
-	// insert value of map, slice, and struct
 	for _, tst := range tests {
 		_, err := insertPath(tst.path, &data, tst.set)
 		if !tst.fail {
@@ -107,6 +104,30 @@ func InsertPath(t *testing.T) {
 			assert.NotNil(t, err)
 		}
 	}
+}
+
+func TestInsert(t *testing.T) {
+	// insert into slice/map with explicit types
+	// insert value of map, slice, and struct
+	d := []map[string]int{{}}
+	insertPath([]string{"0"}, d, map[string]int{"foo": 7})
+	actual, _ := queryPath([]string{"0", "foo"}, d)
+	assert.Equal(t, 7, actual)
+
+	insertPath([]string{"0", "foo"}, d, 9)
+	actual, _ = queryPath([]string{"0", "foo"}, d)
+	assert.Equal(t, 9, actual)
+
+	sd := map[string]Fidget{"one": {}}
+	insertPath([]string{"one"}, sd, Fidget{Name: "Sassy"})
+	actual, _ = queryPath([]string{"one", "Name"}, sd)
+	assert.Equal(t, "Sassy", actual)
+
+	sld := map[string][]int{"one": {}}
+	insertPath([]string{"one"}, sld, []int{0, 1, 2})
+	actual, _ = queryPath([]string{"one", "2"}, sld)
+	assert.Equal(t, 2, 2)
+
 }
 
 func QueryValue(t *testing.T) {
