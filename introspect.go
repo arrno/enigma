@@ -1,4 +1,4 @@
-package main
+package enigma
 
 import (
 	"encoding/json"

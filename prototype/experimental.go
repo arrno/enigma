@@ -1,5 +1,4 @@
-// insertPath inserts any new value at the target path location.
-package main
+package enigma
 
 import (
 	"errors"
