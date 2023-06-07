@@ -1,6 +1,8 @@
 # Enigma
-Enigma provides a very simple API for doing recursive queries and insertions into data of unknown type, structure, and depth.
 [![Go Build](https://github.com/arrno/enigma/actions/workflows/go.yml/badge.svg)](https://github.com/arrno/enigma/actions/workflows/go.yml)
+
+
+Enigma provides a very simple API for doing recursive queries and insertions into data of unknown type, structure, and depth.
 
 ## Install
 ```
