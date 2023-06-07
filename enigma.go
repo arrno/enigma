@@ -13,7 +13,7 @@ import (
 var SUPPORTEDTYPES = []reflect.Kind{reflect.Map, reflect.Slice, reflect.Struct}
 
 type Enigma struct {
-	data     any
+	data any
 }
 
 // NewEnigma takes a pointer to a struct, map, or slice and returns a pointer to a new Enigma.
@@ -48,7 +48,7 @@ func (e *Enigma) QueryValue(value any) []string {
 }
 
 // QueryKey returns all paths that lead to an instance of the target key.
-// 
+//
 // A key is either a map key, a slice index, or a struct field in string format.
 func (e *Enigma) QueryKey(key string) []string {
 	results := []string{}
