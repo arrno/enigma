@@ -6,7 +6,7 @@ Enigma provides a very simple API for doing recursive queries and insertions int
 
 ## Install
 ```
-go get https://github.com/arrno/enigma
+go get github.com/arrno/enigma
 ```
 
 ## Initialize
