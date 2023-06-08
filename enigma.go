@@ -9,7 +9,6 @@ import (
 // <--------------------------------------- Pub API ------------------------------------------->
 // <------------------------------------------------------------------------------------------->
 
-// Structs are not yet supported. Only supporting map[string]<T>
 var SUPPORTEDTYPES = []reflect.Kind{reflect.Map, reflect.Slice, reflect.Struct}
 
 type Enigma struct {

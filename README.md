@@ -1,4 +1,5 @@
 # Enigma
+[![Go Reference](https://pkg.go.dev/badge/github.com/arrno/enigma.svg)](https://pkg.go.dev/github.com/arrno/enigma)
 [![Go Build](https://github.com/arrno/enigma/actions/workflows/go.yml/badge.svg)](https://github.com/arrno/enigma/actions/workflows/go.yml)
 
 
