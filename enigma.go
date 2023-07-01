@@ -86,6 +86,22 @@ func (e *Enigma) InsertByKey(key string, replace any) (err error) {
 	return err
 }
 
+// DropByPath prunes the data at the target path.
+func (e *Enigma) DropByPath(path string) error {
+	rawPath := strings.Split(path, ".")
+	_, err := dropPath(rawPath, e.data)
+	return err
+}
+
+// DropByValue prunes all parent nodes that hold a target value.
+func (e *Enigma) DropByValue(value any) (err error) {
+	paths := e.QueryValue(value)
+	for _, path := range paths {
+		err = e.DropByPath(path)
+	}
+	return err
+}
+
 // Data is a getter for Enigma data.
 func (e *Enigma) Data() any {
 	return e.data
