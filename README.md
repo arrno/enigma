@@ -3,7 +3,7 @@
 [![Go Build](https://github.com/arrno/enigma/actions/workflows/go.yml/badge.svg)](https://github.com/arrno/enigma/actions/workflows/go.yml)
 
 
-Enigma provides a very simple API for doing recursive queries and insertions into data of unknown type, structure, and depth.
+Enigma provides a very simple API for doing recursive queries and insertions into data of unknown type, structure, and depth. This package is currently Alpha/Experimental.
 
 ## Install
 ```
@@ -73,6 +73,17 @@ All instances of the target key will have their corresponding values updated.
 err := enigma.InsertByKey("daysSinceToday", 0)
 ```
 
+## Drop by path
+The last node in the provided path will be pruned from the data.
+```Go
+err := enigma.DropByPath("col.items.5")
+```
+## Drop by value
+Every parent node that holds the target value will be pruned from the data.
+```Go
+// Drop anything that holds a nil value.
+err := enigma.DropByValue(nil)
+```
 ## Get the data back
 Display the underlying data in pretty format.
 ```Go
