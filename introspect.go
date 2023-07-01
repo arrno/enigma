@@ -284,8 +284,6 @@ func insertPath(path []string, data any, newValue any) (any, error) {
 }
 
 // dropPath prunes the data at the target path.
-// 
-// UNTESTED
 func dropPath(path []string, data any) (any, error) {
 
 	if data == nil {
@@ -303,12 +301,14 @@ func dropPath(path []string, data any) (any, error) {
 	}
 
 	handlePtr := func() any {
-		if wasPointer && val.CanAddr() {
-			return val.Addr().Interface()
+		if wasPointer {
+			reflect.ValueOf(data).Elem().Set(val)
+			if val.CanAddr() {
+				return val.Addr().Interface()
+			}
 		}
 		return val.Interface()
 	}
-
 	switch t := val.Type().Kind(); t {
 	case reflect.Map:
 		for _, k := range val.MapKeys() {
@@ -372,7 +372,7 @@ func dropPath(path []string, data any) (any, error) {
 						return handlePtr(), errors.New("Mismatched type.")
 					}
 				} else if wasPointer {
-					val = zeroSliceField(reflect.ValueOf(data), val.Type().Field(i).Name)
+					val = zeroSliceField(val, val.Type().Field(i).Name)
 				}
 				return handlePtr(), nil
 			}

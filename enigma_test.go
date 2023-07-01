@@ -78,28 +78,27 @@ func TestDropRecursive(t *testing.T) {
 	))
 
 	data = makeData()
-	d, _ := dropPath([]string{"two"}, data)
+	dropPath([]string{"two"}, &data)
 	assert.True(t, reflect.DeepEqual(
-		d.(map[string]any),
+		data,
 		map[string]any{
 			"one":[]any{0,1,2,[]int{}},
 			"three": &StrStr{"Blue", &Str{"ZOne", "ZTwo", 50, 70}},
 		},
 	))
 
-	// // PTR
-	// data = makeData()
-	// dropPath([]string{"two"}, &data)
-	// assert.True(t, reflect.DeepEqual(
-	// 	data,
-	// 	map[string]any{
-	// 		"one":[]any{0,1,2,[]int{}},
-	// 		"three": &StrStr{"Blue", &Str{"ZOne", "ZTwo", 50, 70}},
-	// 	},
-	// ))
+	data = makeData()
+	dropPath([]string{"two"}, &data)
+	assert.True(t, reflect.DeepEqual(
+		data,
+		map[string]any{
+			"one":[]any{0,1,2,[]int{}},
+			"three": &StrStr{"Blue", &Str{"ZOne", "ZTwo", 50, 70}},
+		},
+	))
 
 	data = makeData()
-	dropPath([]string{"two", "a"}, data)
+	dropPath([]string{"two", "a"}, &data)
 	assert.True(t, reflect.DeepEqual(
 		data,
 		map[string]any{
@@ -131,28 +130,47 @@ func TestDropRecursive(t *testing.T) {
 		},
 	))
 
-	// data = makeData()
-	// dropPath([]string{"Three"}, &data)
-	// assert.True(t, reflect.DeepEqual(
-	// 	data,
-	// 	map[string]any{
-	// 		"one":[]any{0,1,2,[]int{}},
-	// 		"two":map[string]any{"a":0,"b": &Str{"One", "Two", 5, 7}},
-	// 		"three": &StrStr{},
-	// 	},
-	// ))
+	data = makeData()
+	dropPath([]string{"three","Str"}, &data)
+	assert.True(t, reflect.DeepEqual(
+		data,
+		map[string]any{
+			"one":[]any{0,1,2,[]int{}},
+			"two":map[string]any{"a":0,"b": &Str{"One", "Two", 5, 7}},
+			"three": &StrStr{Control: "Blue", Str: nil},
+		},
+	))
 
-	// data = makeData()
-	// dropPath([]string{"Three", "Str", "One"}, &data)
-	// fmt.Println(fmt.Sprint(data["three"]))
-	// assert.True(t, reflect.DeepEqual(
-	// 	data,
-	// 	map[string]any{
-	// 		"one":[]any{0,1,2,[]int{}},
-	// 		"two":map[string]any{"a":0,"b": &Str{"One", "Two", 5, 7}},
-	// 		"three": &StrStr{"Blue", &Str{"", "ZTwo", 50, 70}},
-	// 	},
-	// ))
+	data = makeData()
+	dropPath([]string{"three", "Str", "One"}, &data)
+	assert.True(t, reflect.DeepEqual(
+		data,
+		map[string]any{
+			"one":[]any{0,1,2,[]int{}},
+			"two":map[string]any{"a":0,"b": &Str{"One", "Two", 5, 7}},
+			"three": &StrStr{"Blue", &Str{"", "ZTwo", 50, 70}},
+		},
+	))
+
+	// root list pointer...
+	ldata := []any{0,1,2}
+	dropPath([]string{"0"}, &ldata)
+	assert.Equal(t, ldata, []any{1,2})
+
+	ldata = []any{0,1,map[string]int{"a":1,"b":2}}
+	dropPath([]string{"2","b"}, &ldata)
+	assert.True(t, reflect.DeepEqual(ldata, []any{0,1,map[string]int{"a":1}}))
+
+	// root struct pointer...
+	sdata := StrStr{
+		Control: "Blue",
+		Str: &Str{"One","Two",5,7},
+	}
+	dropPath([]string{"Str"}, &sdata)
+	assert.True(t, reflect.DeepEqual(sdata, StrStr{Control: "Blue",Str: nil}))
+	sdata.Str = &Str{"One","Two",5,7}
+	dropPath([]string{"Str","One"}, &sdata)
+	assert.True(t, reflect.DeepEqual(sdata, StrStr{Control: "Blue",Str: &Str{"","Two",5,7}}))
 
 }
 
