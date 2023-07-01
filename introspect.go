@@ -219,7 +219,7 @@ func insertPath(path []string, data any, newValue any) (any, error) {
 	}
 
 	handlePtr := func() any {
-		if wasPointer {
+		if wasPointer && val.CanAddr() {
 			return val.Addr().Interface()
 		}
 		return val.Interface()
@@ -303,7 +303,7 @@ func dropPath(path []string, data any) (any, error) {
 	}
 
 	handlePtr := func() any {
-		if wasPointer {
+		if wasPointer && val.CanAddr() {
 			return val.Addr().Interface()
 		}
 		return val.Interface()
@@ -386,7 +386,6 @@ func dropPath(path []string, data any) (any, error) {
 }
 
 func dropSliceIndex(val reflect.Value, index int) reflect.Value {
-	fmt.Println(val.Type().Elem())
 	newVal := reflect.MakeSlice(val.Type(), 0, val.Cap() -1)
 	for i := 0; i < val.Len(); i++ {
 		if i == index {

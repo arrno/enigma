@@ -1,12 +1,23 @@
 package enigma
 
 import (
-	"fmt"
+	"reflect"
 	"sort"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
+
+type Str struct{
+	One string
+	Two string
+	Three int
+	Four int
+}
+type StrStr struct{
+	Control string
+	Str *Str
+}
 
 func TestRun(t *testing.T) {
 	// run in order
@@ -14,6 +25,135 @@ func TestRun(t *testing.T) {
 	QueryKey(t)
 	QueryPath(t)
 	InsertPath(t)
+}
+
+func TestDrop(t *testing.T) {
+
+	a := []string{"one","two","three","four"}
+	a = dropSliceIndex(reflect.ValueOf(a), 1).Interface().([]string)
+	assert.Equal(t, a, []string{"one","three","four"})
+	a = []string{"one","two","three","four"}
+	a = dropSliceIndex(reflect.ValueOf(a), 3).Interface().([]string)
+	assert.Equal(t, a, []string{"one","two","three"})
+
+	m := map[string]any{
+		"one":true,
+		"two":false,
+		"three":true,
+		"four":false,
+	}
+	m = dropMapKey(reflect.ValueOf(m), "two").Interface().(map[string]any)
+	assert.True(t, reflect.DeepEqual(m, map[string]any{"one":true,"three":true,"four":false}))
+	m["two"] = false
+	m = dropMapKey(reflect.ValueOf(m), "three").Interface().(map[string]any)
+	assert.True(t, reflect.DeepEqual(m, map[string]any{"one":true,"two":false,"four":false}))
+
+	s := &Str{"One", "Two", 5, 7}
+	s = zeroSliceField(reflect.ValueOf(s), "One").Interface().(*Str)
+	assert.Equal(t, []any{s.One, s.Two, s.Three, s.Four}, []any{"", "Two", 5, 7})
+	s.One = "One"
+	s = zeroSliceField(reflect.ValueOf(s), "Four").Interface().(*Str)
+	assert.Equal(t, []any{s.One, s.Two, s.Three, s.Four}, []any{"One", "Two", 5, 0})
+}
+
+func makeData() map[string]any {
+	data := map[string]any{
+		"one":[]any{0,1,2,[]int{}},
+		"two":map[string]any{"a":0,"b": &Str{"One", "Two", 5, 7}},
+		"three": &StrStr{"Blue", &Str{"ZOne", "ZTwo", 50, 70}},
+	}
+	return data
+}
+func TestDropRecursive(t *testing.T) {
+
+	data := makeData()
+	dropPath([]string{"one","3"}, &data)
+	assert.True(t, reflect.DeepEqual(
+		data,
+		map[string]any{
+			"one":[]any{0,1,2},
+			"two":map[string]any{"a":0,"b": &Str{"One", "Two", 5, 7}},
+			"three": &StrStr{"Blue", &Str{"ZOne", "ZTwo", 50, 70}},
+		},
+	))
+
+	data = makeData()
+	d, _ := dropPath([]string{"two"}, data)
+	assert.True(t, reflect.DeepEqual(
+		d.(map[string]any),
+		map[string]any{
+			"one":[]any{0,1,2,[]int{}},
+			"three": &StrStr{"Blue", &Str{"ZOne", "ZTwo", 50, 70}},
+		},
+	))
+
+	// // PTR
+	// data = makeData()
+	// dropPath([]string{"two"}, &data)
+	// assert.True(t, reflect.DeepEqual(
+	// 	data,
+	// 	map[string]any{
+	// 		"one":[]any{0,1,2,[]int{}},
+	// 		"three": &StrStr{"Blue", &Str{"ZOne", "ZTwo", 50, 70}},
+	// 	},
+	// ))
+
+	data = makeData()
+	dropPath([]string{"two", "a"}, data)
+	assert.True(t, reflect.DeepEqual(
+		data,
+		map[string]any{
+			"one":[]any{0,1,2,[]int{}},
+			"two":map[string]any{"b": &Str{"One", "Two", 5, 7}},
+			"three": &StrStr{"Blue", &Str{"ZOne", "ZTwo", 50, 70}},
+		},
+	))
+
+	data = makeData()
+	dropPath([]string{"two", "b"}, &data)
+	assert.True(t, reflect.DeepEqual(
+		data,
+		map[string]any{
+			"one":[]any{0,1,2,[]int{}},
+			"two":map[string]any{"a":0},
+			"three": &StrStr{"Blue", &Str{"ZOne", "ZTwo", 50, 70}},
+		},
+	))
+
+	data = makeData()
+	dropPath([]string{"two", "b", "Three"}, &data)
+	assert.True(t, reflect.DeepEqual(
+		data,
+		map[string]any{
+			"one":[]any{0,1,2,[]int{}},
+			"two":map[string]any{"a":0,"b": &Str{"One", "Two", 0, 7}},
+			"three": &StrStr{"Blue", &Str{"ZOne", "ZTwo", 50, 70}},
+		},
+	))
+
+	// data = makeData()
+	// dropPath([]string{"Three"}, &data)
+	// assert.True(t, reflect.DeepEqual(
+	// 	data,
+	// 	map[string]any{
+	// 		"one":[]any{0,1,2,[]int{}},
+	// 		"two":map[string]any{"a":0,"b": &Str{"One", "Two", 5, 7}},
+	// 		"three": &StrStr{},
+	// 	},
+	// ))
+
+	// data = makeData()
+	// dropPath([]string{"Three", "Str", "One"}, &data)
+	// fmt.Println(fmt.Sprint(data["three"]))
+	// assert.True(t, reflect.DeepEqual(
+	// 	data,
+	// 	map[string]any{
+	// 		"one":[]any{0,1,2,[]int{}},
+	// 		"two":map[string]any{"a":0,"b": &Str{"One", "Two", 5, 7}},
+	// 		"three": &StrStr{"Blue", &Str{"", "ZTwo", 50, 70}},
+	// 	},
+	// ))
+
 }
 
 func InsertPath(t *testing.T) {
@@ -239,7 +379,7 @@ func QueryPath(t *testing.T) {
 	for _, p := range paths {
 		val, err := queryPath(p, data)
 		if err != nil {
-			fmt.Println(err.Error())
+			// fmt.Println(err.Error())
 		} else {
 			actual = append(actual, val)
 		}
